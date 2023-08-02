@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Display buildings in 3D</title>
+    <meta
+      property="og:description"
+      content="Use extrusions to display buildings' height in 3D."
+    />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl@3.2.1/dist/maplibre-gl.css"
+    />
+    <script src="https://unpkg.com/maplibre-gl@3.2.1/dist/maplibre-gl.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body,
+      #map {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      const map = new maplibregl.Map({
+        style: "https://demotiles.maplibre.org/style.json",
+        center: [139.6917, 35.6895], // 東京の座標
+        zoom: 10,
+        pitch: 45,
+        bearing: -17.6,
+        container: "map",
+        antialias: true,
+      });
+
+      const addLayer = (map, name) => {
+        const layers = map.getStyle().layers;
+        let id = "admin-boundaries" + layers.length;
+        console.log(id, name);
+        map.addSource(id, {
+          type: "geojson",
+          data: name, // あなたのGeoJSONファイルのパスに置き換えてください
+        });
+        let layerid = "admin-boundaries-fill" + layers.length;
+        map.addLayer({
+          id: layerid,
+          type: "fill",
+          source: id,
+          layout: {},
+          paint: {
+            "fill-color": "#008080",
+            "fill-opacity": 0.5,
+          },
+        });
+      };
+
+      // The 'building' layer in the streets vector source contains building-height
+      // data from OpenStreetMap.
+      map.on("load", () => {
+        // Insert the layer beneath any symbol layer.
+        const layers = map.getStyle().layers;
+        console.log(layers);
+        let labelLayerId;
+        for (let i = 0; i < layers.length; i++) {
+          if (layers[i].type === "symbol" && layers[i].layout["text-field"]) {
+            labelLayerId = layers[i].id;
+            break;
+          }
+        }
+
+        geojson_files = [
+          "L01-23.geojson",
+          "L02-22.geojson",
+          "L03-a-21_5135.geojson",
+          "L03-a-21_5235.geojson",
+          "P05-22_27.geojson",
+        ];
+        geojson_files.forEach((x) => {
+          addLayer(map, x);
+        });
+      });
+    </script>
+  </body>
+</html>
