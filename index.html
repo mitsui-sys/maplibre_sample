@@ -132,16 +132,7 @@
           }
         }
 
-        geojson_files = [
-          "L01-23.geojson",
-          "L02-22.geojson",
-          "L03-a-21_5135.geojson",
-          "L03-a-21_5235.geojson",
-          "P05-22_27.geojson",
-        ];
-        geojson_files.forEach((x) => {
-          addLayer(map, x);
-        });
+        //地理院地図
         let source_data = {
           type: 'raster',
           tiles: ['https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png'],
@@ -157,6 +148,18 @@
           minzoom: 0,
           maxzoom: 18,
         });
+      });
+      
+      //Geojsonファイルでレイヤ追加
+      geojson_files = [
+        "L01-23.geojson",
+        "L02-22.geojson",
+        "L03-a-21_5135.geojson",
+        "L03-a-21_5235.geojson",
+        "P05-22_27.geojson",
+      ];
+      geojson_files.forEach((x) => {
+        addLayer(map, x);
       });
         
 
@@ -177,8 +180,17 @@
       let terrain = new maplibregl.TerrainControl({
         source: 'terrainSource',
         exaggeration: 1
-      })
+      });
       map.addControl(terrain);
+      //ユーザーの位置情報
+      let geolocation = new maplibregl.GeolocateControl(
+        {positionOptions: {enableHighAccuracy: true}, trackUserLocation: true}
+      );
+      map.addControl(geolocation);
+
+      //表示オプション
+      map.showTileBoundaries = true;
+      map.showCollisionBoxes = true;
 
       //マップ外の操作
       document.getElementById('fly').addEventListener('click', () => {
