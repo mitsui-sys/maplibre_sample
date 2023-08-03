@@ -22,15 +22,52 @@
       body,
       #map {
         height: 100%;
+      },
+      #fly {
+          display: block;
+          position: relative;
+          margin: 0px auto;
+          width: 50%;
+          height: 40px;
+          padding: 10px;
+          border: none;
+          border-radius: 3px;
+          font-size: 12px;
+          text-align: center;
+          color: #fff;
+          background: #ee8a65;
       }
     </style>
   </head>
   <body>
     <div id="map"></div>
+    <br />
+    <button id="fly">Fly</button>
     <script>
       const latlon ={
         tokyo:[139.6917, 35.6895], // 東京の座標
         osaka:[135.5021,34.6937] //大阪の座標
+      }
+
+      const isWebglSupported = () => {
+        if (window.WebGLRenderingContext) {
+            const canvas = document.createElement('canvas');
+            try {
+                const context =
+              canvas.getContext('webgl2') || canvas.getContext('webgl');
+                if (context && typeof context.getParameter == 'function') {
+                    return true;
+                }
+            } catch (e) {
+                // WebGL is supported, but disabled
+            }
+            return false;
+        }
+        // WebGL not supported
+        return false;
+      } 
+      if (!isWebglSupported()) {
+          alert('Your browser does not support MapLibre GL');
       }
       const map = new maplibregl.Map({
         style: "https://demotiles.maplibre.org/style.json",
@@ -45,11 +82,12 @@
       const addLayer = (map, name) => {
         const layers = map.getStyle().layers;
         let id = "admin-boundaries" + layers.length;
-        console.log(id, name);
-        map.addSource(id, {
+        let source = {
           type: "geojson",
           data: name, // あなたのGeoJSONファイルのパスに置き換えてください
-        });
+        }
+        console.log(id, name, source);
+        map.addSource(id, source);
         let layerid = "admin-boundaries-fill" + layers.length;
         map.addLayer({
           id: layerid,
@@ -103,10 +141,37 @@
           maxzoom: 18,
         });
       });
+        
 
       // コントロール関係表示
-      map.addControl(new maplibregl.NavigationControl());
+      let navigation = new maplibregl.NavigationControl({
+          visualizePitch: true,
+          showZoom: true,
+          showCompass: true
+      });
+      map.addControl(navigation);
+      // スケール関係表示
+      let scale = new maplibregl.ScaleControl({
+        maxWidth: 80,
+        unit: 'imperial'
+      });
+      map.addControl(scale);
+      // Terrain関係表示
+      let terrain = new maplibregl.TerrainControl({
+        source: 'terrainSource',
+        exaggeration: 1
+      })
+      map.addControl(terrain);
 
+      //マップ外の操作
+      document.getElementById('fly').addEventListener('click', () => {
+          // Fly to a random location by offsetting the point -74.50, 40
+          // by up to 5 degrees.
+          map.flyTo({
+              center: latlon.osaka,
+              essential: true // this animation is considered essential with respect to prefers-reduced-motion
+          });
+      });
     </script>
   </body>
 </html>
