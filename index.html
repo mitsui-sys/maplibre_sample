@@ -1,262 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
   <head>
-    <title>Display buildings in 3D</title>
+    <title>Potal Page</title>
     <meta
       property="og:description"
       content="Use extrusions to display buildings' height in 3D."
     />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/maplibre-gl@3.2.1/dist/maplibre-gl.css"
-    />
-    <link rel="stylesheet" href="./import.css" />
-    <script src="https://unpkg.com/maplibre-gl@3.2.1/dist/maplibre-gl.js"></script>
-    <link href='https://www.unpkg.com/@watergis/maplibre-gl-export@2.0.0/dist/maplibre-gl-export.css' rel='stylesheet' />
-    <script src="https://www.unpkg.com/@watergis/maplibre-gl-export@2.0.0/dist/maplibre-gl-export.umd.js"></script>
-    <link href='https://www.unpkg.com/@watergis/maplibre-gl-legend@latest/dist/maplibre-gl-legend.css' rel='stylesheet' />
-    <script src="https://www.unpkg.com/@watergis/maplibre-gl-legend@latest/dist/maplibre-gl-legend.umd.js"></script>
-
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-      }
-      html,
-      body,
-      #map {
-        height: 100%;
-      },
-      #fly {
-          display: block;
-          position: relative;
-          margin: 0px auto;
-          width: 50%;
-          height: 40px;
-          padding: 10px;
-          border: none;
-          border-radius: 3px;
-          font-size: 12px;
-          text-align: center;
-          color: #fff;
-          background: #ee8a65;
-      }
-    </style>
+    <link rel="stylesheet" href="./index.css" />
   </head>
   <body>
-    <div id="map"></div>
-    <nav id="listing-group" class="listing-group">
-        <input type="checkbox" id="scrollZoom" checked="checked" />
-        <label for="scrollZoom">Scroll zoom</label>
-        <input type="checkbox" id="boxZoom" checked="checked" />
-        <label for="boxZoom">Box zoom</label>
-        <input type="checkbox" id="dragRotate" checked="checked" />
-        <label for="dragRotate">Drag rotate</label>
-        <input type="checkbox" id="dragPan" checked="checked" />
-        <label for="dragPan">Drag pan</label>
-        <input type="checkbox" id="keyboard" checked="checked" />
-        <label for="keyboard">Keyboard</label>
-        <input type="checkbox" id="doubleClickZoom" checked="checked" />
-        <label for="doubleClickZoom">Double click zoom</label>
-        <input type="checkbox" id="touchZoomRotate" checked="checked" />
-        <label for="touchZoomRotate">Touch zoom rotate</label>
-    </nav>
-    <br />
-    <button id="fly">Fly</button>
-    <script>
-      const latlon ={
-        tokyo:[139.6917, 35.6895], // 東京の座標
-        osaka:[135.5021,34.6937] //大阪の座標
-      }
-
-      const isWebglSupported = () => {
-        if (window.WebGLRenderingContext) {
-            const canvas = document.createElement('canvas');
-            try {
-                const context =
-              canvas.getContext('webgl2') || canvas.getContext('webgl');
-                if (context && typeof context.getParameter == 'function') {
-                    return true;
-                }
-            } catch (e) {
-                // WebGL is supported, but disabled
-            }
-            return false;
-        }
-        // WebGL not supported
-        return false;
-      } 
-      if (!isWebglSupported()) {
-          alert('Your browser does not support MapLibre GL');
-      }
-      const map = new maplibregl.Map({
-        style: "https://demotiles.maplibre.org/style.json",
-        center: latlon.osaka, 
-        zoom: 10,
-        pitch: 45,
-        bearing: -17.6,
-        container: "map",
-        antialias: true,
-      });
-
-      const addLayer = (map, name) => {
-        const layers = map.getStyle().layers;
-        let id = "admin-boundaries" + layers.length;
-        let source = {
-          type: "geojson",
-          data: name, // あなたのGeoJSONファイルのパスに置き換えてください
-        }
-        console.log(id, name, source);
-        map.addSource(id, source);
-        let layerid = "admin-boundaries-fill" + layers.length;
-        map.addLayer({
-          id: layerid,
-          type: "fill",
-          source: id,
-          layout: {},
-          paint: {
-            "fill-color": "#008080",
-            "fill-opacity": 0.5,
-          },
-        });
-      };
-
-      // The 'building' layer in the streets vector source contains building-height
-      // data from OpenStreetMap.
-      map.on("load", () => {
-        // Insert the layer beneath any symbol layer.
-        const layers = map.getStyle().layers;
-        console.log(layers);
-        let labelLayerId;
-        for (let i = 0; i < layers.length; i++) {
-          if (layers[i].type === "symbol" && layers[i].layout["text-field"]) {
-            labelLayerId = layers[i].id;
-            break;
-          }
-        }
-
-        //地理院地図
-        let source_data = {
-          type: 'raster',
-          tiles: ['https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png'],
-          tileSize: 256,
-          attribution:
-              '<a href="http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html" target="_blank">地理院タイル</a>',
-        }
-        map.addSource("t_pale", source_data);
-        map.addLayer({
-          id: "地理院地図",
-          type: "raster",
-          source: "t_pale",
-          minzoom: 0,
-          maxzoom: 18,
-        });
-      });
-      
-      //Geojsonファイルでレイヤ追加
-      geojson_files = [
-        "L01-23.geojson",
-        "L02-22.geojson",
-        "L03-a-21_5135.geojson",
-        "L03-a-21_5235.geojson",
-        "P05-22_27.geojson",
-      ];
-      geojson_files.forEach((x) => {
-        addLayer(map, x);
-      });
-        
-
-      // コントロール関係表示
-      let navigation = new maplibregl.NavigationControl({
-          visualizePitch: true,
-          showZoom: true,
-          showCompass: true
-      });
-      map.addControl(navigation);
-      // スケール関係表示
-      let scale = new maplibregl.ScaleControl({
-        maxWidth: 80,
-        unit: 'imperial'
-      });
-      map.addControl(scale);
-      // Terrain関係表示
-      let terrain = new maplibregl.TerrainControl({
-        source: 'terrainSource',
-        exaggeration: 1
-      });
-      map.addControl(terrain);
-      //ユーザーの位置情報
-      let geolocation = new maplibregl.GeolocateControl(
-        {positionOptions: {enableHighAccuracy: true}, trackUserLocation: true}
-      );
-      map.addControl(geolocation);
-      // 地図印刷
-      map.addControl(new MaplibreExportControl({
-          PageSize: Size.A4,
-          PageOrientation: PageOrientation.Portrait,
-          Format: Format.PDF,
-          DPI: DPI[300],
-          Crosshair: true,
-          PrintableArea: true
-          
-      }), 'top-right');
-      // 凡例表示
-      const targets = {
-          'pipeline': 'Pipeline',
-          'pipeline_annotation': 'Pipeline Label', 
-          'meter': 'Water Meter',
-          'flow meter': 'Flow Meter', 
-          'valve': 'Valve', 
-          'firehydrant': 'Fire Hydrant', 
-          'washout': 'Washout',
-          'tank': 'Tank', 
-          'tank_annotation': 'Tank Label', 
-          'wtp': 'WTP', 
-          'wtp_annotation': 'WTP Label', 
-          'intake': 'Intake', 
-          'intake_annotation': 'Intake Label', 
-          'parcels': 'Parcels', 
-          'parcels_annotation': 'Parcels Label', 
-          'village': 'Village', 
-          'village_annotation': 'Village Label', 
-          'dma': 'DMA',
-          'dma-annotation': 'DMA Label', 
-          'contour-line': 'Countour',
-          'contour-label': 'Contour Label',
-          'hillshade': 'Hillshade'
-      };
-      map.addControl(new MaplibreLegendControl(targets, {
-          showDefault: false, 
-          showCheckbox: false, 
-          onlyRendered: true,
-          reverseOrder: true
-      }), 'top-right');
-
-      //表示オプション
-      map.showTileBoundaries = true;
-      map.showCollisionBoxes = true;
-
-      //マップ外の操作
-      document.getElementById('fly').addEventListener('click', () => {
-          // Fly to a random location by offsetting the point -74.50, 40
-          // by up to 5 degrees.
-          map.flyTo({
-              center: latlon.osaka,
-              essential: true // this animation is considered essential with respect to prefers-reduced-motion
-          });
-      });
-      document
-        .getElementById('listing-group')
-        .addEventListener('change', (e) => {
-            const handler = e.target.id;
-            if (e.target.checked) {
-                map[handler].enable();
-            } else {
-                map[handler].disable();
-            }
-        });
-    </script>
+    <div class="a">
+      <header class="header">
+        <h1><a href="#"><img class="logo" src="img/logo.png" alt="会社ロゴ"></a></h1>
+        <nav class="h-nav">
+          <ul class="b">
+            <li><a href="#">menu1</a></li>
+            <li><a href="#">menu2</a></li>
+            <li><a href="#">menu3</a></li>
+            <li><a href="#">menu4</a></li>
+            <li><a href="#">menu5</a></li>
+            <li><a href="#">menu6</a></li>
+          </ul>
+        </nav>  
+      </header>
+      <img class="h-img" src="img/sea.jpg" alt="sea">
+      <div class="c">
+        <main class="main">
+          <ul>
+           <li>
+            <a href="map.html">Map</a>
+           </li>
+           <li>
+            <a href="fullscreen.html">Blog</a>
+           </li>
+           <li>
+            <a href="contact.html">Contact</a>
+           </li>
+          <ul>
+        </main>
+        <aside class="side">サイド</aside>
+        <div class="sub">サブ</div>
+      </div>
+      <footer class="footer">
+        テキスト
+      </footer>
+    </div>
   </body>
 </html>
