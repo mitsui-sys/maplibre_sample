@@ -28,9 +28,13 @@
   <body>
     <div id="map"></div>
     <script>
+      const latlon ={
+        tokyo:[139.6917, 35.6895], // 東京の座標
+        osaka:[135.5021,34.6937] //大阪の座標
+      }
       const map = new maplibregl.Map({
         style: "https://demotiles.maplibre.org/style.json",
-        center: [139.6917, 35.6895], // 東京の座標
+        center: latlon.osaka, 
         zoom: 10,
         pitch: 45,
         bearing: -17.6,
@@ -83,7 +87,26 @@
         geojson_files.forEach((x) => {
           addLayer(map, x);
         });
+        let source_data = {
+          type: 'raster',
+          tiles: ['https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png'],
+          tileSize: 256,
+          attribution:
+              '<a href="http://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html" target="_blank">地理院タイル</a>',
+        }
+        map.addSource("t_pale", source_data);
+        map.addLayer({
+          id: "地理院地図",
+          type: "raster",
+          source: "t_pale",
+          minzoom: 0,
+          maxzoom: 18,
+        });
       });
+
+      // コントロール関係表示
+      map.addControl(new maplibregl.NavigationControl());
+
     </script>
   </body>
 </html>
