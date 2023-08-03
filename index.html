@@ -12,6 +12,7 @@
       rel="stylesheet"
       href="https://unpkg.com/maplibre-gl@3.2.1/dist/maplibre-gl.css"
     />
+    <link rel="stylesheet" href="./import.css" />
     <script src="https://unpkg.com/maplibre-gl@3.2.1/dist/maplibre-gl.js"></script>
     <style>
       body {
@@ -41,6 +42,22 @@
   </head>
   <body>
     <div id="map"></div>
+    <nav id="listing-group" class="listing-group">
+        <input type="checkbox" id="scrollZoom" checked="checked" />
+        <label for="scrollZoom">Scroll zoom</label>
+        <input type="checkbox" id="boxZoom" checked="checked" />
+        <label for="boxZoom">Box zoom</label>
+        <input type="checkbox" id="dragRotate" checked="checked" />
+        <label for="dragRotate">Drag rotate</label>
+        <input type="checkbox" id="dragPan" checked="checked" />
+        <label for="dragPan">Drag pan</label>
+        <input type="checkbox" id="keyboard" checked="checked" />
+        <label for="keyboard">Keyboard</label>
+        <input type="checkbox" id="doubleClickZoom" checked="checked" />
+        <label for="doubleClickZoom">Double click zoom</label>
+        <input type="checkbox" id="touchZoomRotate" checked="checked" />
+        <label for="touchZoomRotate">Touch zoom rotate</label>
+    </nav>
     <br />
     <button id="fly">Fly</button>
     <script>
@@ -172,6 +189,16 @@
               essential: true // this animation is considered essential with respect to prefers-reduced-motion
           });
       });
+      document
+        .getElementById('listing-group')
+        .addEventListener('change', (e) => {
+            const handler = e.target.id;
+            if (e.target.checked) {
+                map[handler].enable();
+            } else {
+                map[handler].disable();
+            }
+        });
     </script>
   </body>
 </html>
