@@ -14,6 +14,11 @@
     />
     <link rel="stylesheet" href="./import.css" />
     <script src="https://unpkg.com/maplibre-gl@3.2.1/dist/maplibre-gl.js"></script>
+    <link href='https://www.unpkg.com/@watergis/maplibre-gl-export@2.0.0/dist/maplibre-gl-export.css' rel='stylesheet' />
+    <script src="https://www.unpkg.com/@watergis/maplibre-gl-export@2.0.0/dist/maplibre-gl-export.umd.js"></script>
+    <link href='https://www.unpkg.com/@watergis/maplibre-gl-legend@latest/dist/maplibre-gl-legend.css' rel='stylesheet' />
+    <script src="https://www.unpkg.com/@watergis/maplibre-gl-legend@latest/dist/maplibre-gl-legend.umd.js"></script>
+
     <style>
       body {
         margin: 0;
@@ -187,6 +192,47 @@
         {positionOptions: {enableHighAccuracy: true}, trackUserLocation: true}
       );
       map.addControl(geolocation);
+      // 地図印刷
+      map.addControl(new MaplibreExportControl({
+          PageSize: Size.A4,
+          PageOrientation: PageOrientation.Portrait,
+          Format: Format.PDF,
+          DPI: DPI[300],
+          Crosshair: true,
+          PrintableArea: true
+          
+      }), 'top-right');
+      // 凡例表示
+      const targets = {
+          'pipeline': 'Pipeline',
+          'pipeline_annotation': 'Pipeline Label', 
+          'meter': 'Water Meter',
+          'flow meter': 'Flow Meter', 
+          'valve': 'Valve', 
+          'firehydrant': 'Fire Hydrant', 
+          'washout': 'Washout',
+          'tank': 'Tank', 
+          'tank_annotation': 'Tank Label', 
+          'wtp': 'WTP', 
+          'wtp_annotation': 'WTP Label', 
+          'intake': 'Intake', 
+          'intake_annotation': 'Intake Label', 
+          'parcels': 'Parcels', 
+          'parcels_annotation': 'Parcels Label', 
+          'village': 'Village', 
+          'village_annotation': 'Village Label', 
+          'dma': 'DMA',
+          'dma-annotation': 'DMA Label', 
+          'contour-line': 'Countour',
+          'contour-label': 'Contour Label',
+          'hillshade': 'Hillshade'
+      };
+      map.addControl(new MaplibreLegendControl(targets, {
+          showDefault: false, 
+          showCheckbox: false, 
+          onlyRendered: true,
+          reverseOrder: true
+      }), 'top-right');
 
       //表示オプション
       map.showTileBoundaries = true;
