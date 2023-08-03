@@ -99,6 +99,7 @@
         bearing: -17.6,
         container: "map",
         antialias: true,
+        layers:[]
       });
 
       const addLayer = (map, name) => {
@@ -126,16 +127,7 @@
       // The 'building' layer in the streets vector source contains building-height
       // data from OpenStreetMap.
       map.on("load", () => {
-        // Insert the layer beneath any symbol layer.
-        const layers = map.getStyle().layers;
-        console.log(layers);
-        let labelLayerId;
-        for (let i = 0; i < layers.length; i++) {
-          if (layers[i].type === "symbol" && layers[i].layout["text-field"]) {
-            labelLayerId = layers[i].id;
-            break;
-          }
-        }
+        
 
         //地理院地図
         let source_data = {
@@ -201,7 +193,7 @@
           Crosshair: true,
           PrintableArea: true
           
-      }), 'top-right');
+      }));
       // 凡例表示
       const targets = {
           'pipeline': 'Pipeline',
@@ -232,7 +224,7 @@
           showCheckbox: false, 
           onlyRendered: true,
           reverseOrder: true
-      }), 'top-right');
+      }));
 
       //表示オプション
       map.showTileBoundaries = true;
