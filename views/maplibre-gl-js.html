@@ -22,7 +22,7 @@ body { margin:0; padding:0; }
 
 
 <script>
-var map = new maplibregl.Map({
+let map = new maplibregl.Map({
   container: 'map',
   style: 'https://demotiles.maplibre.org/style.json',
   center: [139.767144, 35.680621], 
@@ -32,8 +32,8 @@ var map = new maplibregl.Map({
 });
 
 
-map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-map.addControl(new mapboxgl.ScaleControl() );
+map.addControl(new map.NavigationControl(), 'bottom-right');
+map.addControl(new map.ScaleControl() );
 
 </script>
  
