@@ -4,8 +4,8 @@
 <meta charset='utf-8' />
 <title>地理院地図VectorのベクトルタイルをMapbox GL JSで表示するサンプル</title>
 <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-<script src='./mapbox/1.8.1/mapbox-gl.js'></script>
-<link href='./mapbox/1.8.1/mapbox-gl.css' rel='stylesheet' />
+<script src='https://unpkg.com/maplibre-gl/dist/maplibre-gl.js'></script>
+<link href='https://unpkg.com/maplibre-gl/dist/maplibre-gl.css' rel='stylesheet' />
 <style>
 body { margin:0; padding:0; }
 #map {
@@ -24,12 +24,11 @@ body { margin:0; padding:0; }
 <script>
 var map = new mapboxgl.Map({
   container: 'map',
-  hash: true,
-  style: './std.json', //style.jsonへのパス
+  style: 'https://demotiles.maplibre.org/style.json',
   center: [139.767144, 35.680621], 
   zoom: 15,
   maxZoom: 17.99,
-  minZoom: 4,
+  minZoom: 10,
   localIdeographFontFamily: false
 //  localIdeographFontFamily: ['MS Gothic', 'Hiragino Kaku Gothic Pro', 'sans-serif']
 });
